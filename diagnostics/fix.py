@@ -34,3 +34,10 @@ async def disable_system_proxy() -> dict:
         modified.append(s)
 
     return {"success": True, "services": modified, "message": f"已关停 {len(modified)} 个网络接口的系统代理"}
+
+
+async def flush_arp() -> dict:
+    """Flush macOS ARP cache table."""
+    r = await run("sudo arp -d -a 2>/dev/null || arp -d -a 2>/dev/null || true")
+    return {"success": True, "message": "ARP 路由表缓存已清理"}
+

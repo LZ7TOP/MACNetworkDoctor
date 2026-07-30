@@ -12,10 +12,12 @@ from diagnostics import (
     check_extensions,
     check_hosts,
     check_network,
+    check_latency,
     check_proxy,
     fix_chrome_dns,
     flush_dns,
     disable_system_proxy,
+    flush_arp,
 )
 
 app = FastAPI(title="Network Doctor", version="1.0.0", docs_url=None, redoc_url=None)
@@ -57,6 +59,11 @@ async def api_network():
     return await check_network()
 
 
+@app.get("/api/check/latency")
+async def api_latency():
+    return await check_latency()
+
+
 @app.get("/api/check/proxy")
 async def api_proxy():
     return await check_proxy()
@@ -94,4 +101,10 @@ async def api_flush_dns():
 @app.post("/api/fix/disable-proxy")
 async def api_disable_proxy():
     return await disable_system_proxy()
+
+
+@app.post("/api/fix/flush-arp")
+async def api_flush_arp():
+    return await flush_arp()
+
 

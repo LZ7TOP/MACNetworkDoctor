@@ -147,6 +147,7 @@ function App() {
     const labels = {
       diagnose: '正在分析系统代理、网卡连通性、VPN 及 Chrome 配置...',
       network: '正在分析物理网络与 DNS 连通性...',
+      latency: '正在并发测试国内外主流节点 HTTP 响应延迟...',
       proxy: '正在检索全局代理设置、活动进程与监听端口...',
       extensions: '正在读取系统网络扩展状态...',
       chrome: '正在检索 Chrome Local State 与 DoH 规则...',
@@ -186,6 +187,15 @@ function App() {
         setStatus({ text: '系统代理关停成功', type: 'ok' });
       } else {
         setStatus({ text: '操作失败: ' + (res.error || '未知错误'), type: 'bad' });
+      }
+    } else if (fixType === 'flush-arp') {
+      setStatus({ text: '正在清理 ARP 缓存...', type: 'warn' });
+      setLoading(true);
+      const res = await fetchApi('/fix/flush-arp', { method: 'POST' });
+      setLoading(false);
+      if (res.success) {
+        showToast('ARP 路由表缓存已重置清理');
+        setStatus({ text: 'ARP 缓存清理成功', type: 'ok' });
       }
     } else if (fixType === 'chrome-dns') {
       if (!window.confirm('确定将 Chrome 安全 DNS 强制重置为 off？\n\n请确保已退出 Chrome (Cmd+Q)。')) return;
@@ -280,6 +290,9 @@ function App() {
           <button className={`tab-btn ${activeTab === 'network' ? 'active' : ''}`} onClick={() => runDiagnostic('network')}>
             <Icons.Globe /> 网络基础
           </button>
+          <button className={`tab-btn ${activeTab === 'latency' ? 'active' : ''}`} onClick={() => runDiagnostic('latency')}>
+            <Icons.Zap /> 节点测速
+          </button>
           <button className={`tab-btn ${activeTab === 'proxy' ? 'active' : ''}`} onClick={() => runDiagnostic('proxy')}>
             <Icons.Shield /> 代理 & VPN
           </button>
@@ -303,6 +316,9 @@ function App() {
             </button>
             <button className="action-btn" onClick={() => handleQuickFix('disable-proxy')}>
               <Icons.Shield /> 关停系统代理
+            </button>
+            <button className="action-btn" onClick={() => handleQuickFix('flush-arp')}>
+              <Icons.Refresh /> 清理 ARP 缓存
             </button>
             <button className="action-btn danger-btn" onClick={() => handleQuickFix('chrome-dns')}>
               <Icons.Cpu /> 修复 Chrome DNS
@@ -423,11 +439,39 @@ function DiagnosisView({ data, activeTab, onCopy }) {
     );
   }
 
-  // 3. 代理 & VPN View
+  // 3. 节点 Latency 测速 View
+  if (activeTab === 'latency') {
+    const targets = data.targets || [];
+    return (
+      <div className="card-grid">
+        <GlassCard title="国内外核心节点响应耗时测速" icon={<Icons.Zap />}>
+          {targets.map((t, idx) => (
+            <InfoRow
+              key={idx}
+              label={t.name}
+              val={t.ok ? `${t.latency} ms` : '超时/不可达'}
+              status={!t.ok ? 'bad' : t.latency < 150 ? 'good' : t.latency < 400 ? 'warn' : 'bad'}
+              onCopy={onCopy}
+            />
+          ))}
+        </GlassCard>
+      </div>
+    );
+  }
+
+  // 4. 代理 & VPN View
   if (activeTab === 'proxy') {
     const procs = data.processes || [];
     const ports = (data.proxy_ports || []).filter(Boolean);
     const vpns = data.vpn || [];
+
+    // Extract first proxy port for terminal export helper
+    let exportCmd = '';
+    const matchPort = ports[0]?.match(/:(\d+)/);
+    if (matchPort) {
+      const portNum = matchPort[1];
+      exportCmd = `export http_proxy=http://127.0.0.1:${portNum}; export https_proxy=http://127.0.0.1:${portNum}`;
+    }
 
     return (
       <>
@@ -450,6 +494,16 @@ function DiagnosisView({ data, activeTab, onCopy }) {
           </GlassCard>
         </div>
 
+        {exportCmd && (
+          <div className="glass-card full-width" style={{ marginTop: '18px' }}>
+            <div className="card-header"><Icons.Terminal /> 终端 Terminal 一键代理命令</div>
+            <div style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: '8px' }}>检测到监听代理端口，点击下方命令可直接复制到 macOS 终端生效：</div>
+            <div className="code-wrapper" style={{ cursor: 'pointer' }} onClick={() => onCopy(exportCmd)}>
+              {exportCmd}
+            </div>
+          </div>
+        )}
+
         {procs.length > 0 && (
           <div className="glass-card full-width" style={{ marginTop: '18px' }}>
             <div className="card-header"><Icons.Terminal /> 活动代理进程明细</div>
@@ -466,7 +520,7 @@ function DiagnosisView({ data, activeTab, onCopy }) {
     );
   }
 
-  // 4. 网络扩展 View
+  // 5. 网络扩展 View
   if (activeTab === 'extensions') {
     const exts = data.extensions || [];
     const activeSuspicious = exts.filter(e => e.active && e.suspicious);
@@ -490,7 +544,7 @@ function DiagnosisView({ data, activeTab, onCopy }) {
     );
   }
 
-  // 5. Chrome DNS View
+  // 6. Chrome DNS View
   if (activeTab === 'chrome') {
     if (!data.exists) {
       return <div className="alert-box info">未安装 Google Chrome，无需解析 Chrome 配置文件</div>;
@@ -508,7 +562,7 @@ function DiagnosisView({ data, activeTab, onCopy }) {
     );
   }
 
-  // 6. Hosts View
+  // 7. Hosts View
   if (activeTab === 'hosts') {
     const entries = data.entries || [];
     return (
@@ -525,6 +579,7 @@ function DiagnosisView({ data, activeTab, onCopy }) {
 
   return null;
 }
+
 
 // ── Card Helper Components ─────────────────────────────────
 function GlassCard({ title, icon, children }) {

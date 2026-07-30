@@ -29,3 +29,33 @@ async def check_network() -> dict:
         "ping_google": results["ping_google"].ok,
         "http_baidu": "200" in results["http_baidu"].stdout or "HTTP" in results["http_baidu"].stdout,
     }
+
+
+async def check_latency() -> dict:
+    """Measure HTTP latency for popular domestic and global sites."""
+    targets = [
+        ("百度 (Baidu)", "https://www.baidu.com"),
+        ("淘宝 (Taobao)", "https://www.taobao.com"),
+        ("腾讯 (QQ)", "https://www.qq.com"),
+        ("GitHub", "https://github.com"),
+        ("Cloudflare 1.1.1.1", "https://1.1.1.1"),
+        ("Google DNS", "https://8.8.8.8"),
+    ]
+
+    async def _test_one(name, url):
+        import time
+        t0 = time.time()
+        r = await run(f"curl -sI --connect-timeout 3 {url} 2>&1 | head -1")
+        dt = int((time.time() - t0) * 1000)
+        ok = r.ok and ("HTTP" in r.stdout or "200" in r.stdout or "301" in r.stdout or "302" in r.stdout)
+        return {
+            "name": name,
+            "url": url,
+            "latency": dt if ok else None,
+            "ok": ok
+        }
+
+    import asyncio
+    results = await asyncio.gather(*[_test_one(n, u) for n, u in targets])
+    return {"targets": results}
+

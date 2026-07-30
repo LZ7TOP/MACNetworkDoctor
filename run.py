@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""🩺 Network Doctor — 启动入口"""
+"""Network Doctor — 启动入口（支持开发热更新）"""
 
 import subprocess
 import sys
@@ -21,7 +21,7 @@ def main():
 
     print()
     print("╔══════════════════════════════════════════════════════╗")
-    print("║        🩺  Network Doctor — Web 控制台 v1.0         ║")
+    print("║        Network Doctor — Web 控制台 v1.6 (热更新)     ║")
     print("║        http://localhost:19999                        ║")
     print("║        按 Ctrl+C 停止                               ║")
     print("╚══════════════════════════════════════════════════════╝")
@@ -31,10 +31,12 @@ def main():
         "api.app:app",
         host="127.0.0.1",
         port=19999,
-        reload=False,
-        log_level="warning",
+        reload=True,
+        reload_dirs=["api", "diagnostics", "static"],
+        log_level="info",
     )
 
 
 if __name__ == "__main__":
     main()
+
