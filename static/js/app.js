@@ -205,6 +205,7 @@ function App() {
   const [clock, setClock] = useState('');
   const [toast, setToast] = useState(null);
   const [pwdModal, setPwdModal] = useState({ isOpen: false, fixType: null, errorMsg: '' });
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, fixType: null, title: '', message: '' });
   const [cachedPassword, setCachedPassword] = useState('');
 
   // Calculate Health Score
@@ -261,12 +262,30 @@ function App() {
     setStatus({ text: '检测完成', type: hasError ? 'warn' : 'ok' });
   }, []);
 
-  const handleQuickFix = async (fixType, password = cachedPassword) => {
+  const handleQuickFix = async (fixType, password = cachedPassword, isConfirmed = false) => {
+    if (!isConfirmed && !password) {
+      if (fixType === 'disable-proxy') {
+        setConfirmModal({
+          isOpen: true,
+          fixType,
+          title: '重置系统代理确认',
+          message: '此操作将重置并强制关停当前所有活动网卡的 HTTP/HTTPS/SOCKS 系统代理设置。\n确定要继续执行吗？'
+        });
+        return;
+      }
+      if (fixType === 'chrome-dns') {
+        setConfirmModal({
+          isOpen: true,
+          fixType,
+          title: '重置 Chrome DNS 确认',
+          message: '确定将 Chrome 安全 DNS (Secure DoH) 强制重置为 off 禁用状态？\n\n请在重置前确保已完全退出 Chrome (Cmd+Q)。'
+        });
+        return;
+      }
+    }
+
     let endpoint = '/fix/' + fixType;
     if (fixType === 'chrome-dns') endpoint = '/fix/chrome-dns';
-
-    if (fixType === 'disable-proxy' && !password && !window.confirm('此操作将重置并关停所有活动网卡的系统代理设置，确定继续？')) return;
-    if (fixType === 'chrome-dns' && !password && !window.confirm('确定将 Chrome 安全 DNS 强制重置为 off？\n\n请确保已退出 Chrome (Cmd+Q)。')) return;
 
     const fixLabels = {
       'flush-dns': '正在刷新系统 DNS 缓存...',
@@ -514,13 +533,57 @@ function App() {
       <SudoPasswordModal
         isOpen={pwdModal.isOpen}
         errorMsg={pwdModal.errorMsg}
-        onSubmit={(pass) => handleQuickFix(pwdModal.fixType, pass)}
+        onSubmit={(pass) => handleQuickFix(pwdModal.fixType, pass, true)}
         onCancel={() => setPwdModal({ isOpen: false, fixType: null, errorMsg: '' })}
+      />
+
+      {/* Custom Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          const ft = confirmModal.fixType;
+          setConfirmModal({ isOpen: false, fixType: null, title: '', message: '' });
+          handleQuickFix(ft, cachedPassword, true);
+        }}
+        onCancel={() => setConfirmModal({ isOpen: false, fixType: null, title: '', message: '' })}
       />
 
       {/* Toast Notification */}
       {toast && <div className="toast-msg">{toast}</div>}
     </>
+  );
+}
+
+// ── Custom Confirm Modal Component ───────────────────────────
+function ConfirmModal({ isOpen, title, message, onConfirm, onCancel }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-card">
+        <div className="modal-title" style={{ color: 'var(--yellow)' }}>
+          <Icons.Alert /> <span>{title || '操作确认'}</span>
+        </div>
+        <p className="modal-desc" style={{ whiteSpace: 'pre-line' }}>
+          {message}
+        </p>
+        <div className="modal-actions">
+          <button type="button" className="action-btn" onClick={onCancel}>
+            取消
+          </button>
+          <button
+            type="button"
+            className="action-btn"
+            style={{ background: 'var(--yellow)', color: '#000000', borderColor: 'var(--yellow)', fontWeight: 600 }}
+            onClick={onConfirm}
+          >
+            确认执行
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
