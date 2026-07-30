@@ -59,3 +59,33 @@ async def check_latency() -> dict:
     results = await asyncio.gather(*[_test_one(n, u) for n, u in targets])
     return {"targets": results}
 
+
+async def benchmark_dns() -> dict:
+    """Benchmark popular public DNS servers for resolution speed."""
+    dns_servers = [
+        ("阿里 DNS (223.5.5.5)", "223.5.5.5"),
+        ("腾讯 DNSPod (119.29.29.29)", "119.29.29.29"),
+        ("百度 DNS (180.76.76.76)", "180.76.76.76"),
+        ("Cloudflare DNS (1.1.1.1)", "1.1.1.1"),
+        ("Google DNS (8.8.8.8)", "8.8.8.8"),
+    ]
+
+    async def _test_dns(name, server):
+        import time
+        t0 = time.time()
+        r = await run(f"dig @{server} baidu.com +time=2 +tries=1 +short 2>&1")
+        dt = int((time.time() - t0) * 1000)
+        ok = r.ok and bool(r.stdout.strip())
+        return {
+            "name": name,
+            "server": server,
+            "latency": dt if ok else None,
+            "ip_result": r.stdout.splitlines()[0] if ok else None,
+            "ok": ok
+        }
+
+    import asyncio
+    results = await asyncio.gather(*[_test_dns(n, s) for n, s in dns_servers])
+    return {"dns_servers": results}
+
+

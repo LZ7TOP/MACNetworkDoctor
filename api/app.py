@@ -14,12 +14,14 @@ from diagnostics import (
     check_hosts,
     check_network,
     check_latency,
+    benchmark_dns,
     check_proxy,
     fix_chrome_dns,
     flush_dns,
     disable_system_proxy,
     flush_arp,
 )
+
 
 app = FastAPI(title="Network Doctor", version="1.6.0", docs_url=None, redoc_url=None)
 
@@ -77,6 +79,12 @@ async def api_network():
 @app.get("/api/check/latency")
 async def api_latency():
     return await check_latency()
+
+
+@app.get("/api/check/dns-benchmark")
+async def api_dns_benchmark():
+    return await benchmark_dns()
+
 
 
 @app.get("/api/check/proxy")

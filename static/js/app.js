@@ -155,10 +155,20 @@ function App() {
     };
 
     setStatus({ text: labels[tabName] || '请求中...', type: 'warn' });
-    const result = await fetchApi(tabName === 'diagnose' ? '/diagnose' : '/check/' + tabName);
+    let result = {};
+    if (tabName === 'latency') {
+      const [resLat, resDns] = await Promise.all([
+        fetchApi('/check/latency'),
+        fetchApi('/check/dns-benchmark')
+      ]);
+      result = { ...resLat, ...resDns };
+    } else {
+      result = await fetchApi(tabName === 'diagnose' ? '/diagnose' : '/check/' + tabName);
+    }
     
     setData(result);
     setLoading(false);
+
 
     const hasError = result.error || (result.network && result.network.http_baidu === false);
     setStatus({ text: '检测完成', type: hasError ? 'warn' : 'ok' });
@@ -439,12 +449,14 @@ function DiagnosisView({ data, activeTab, onCopy }) {
     );
   }
 
-  // 3. 节点 Latency 测速 View
+  // 3. 节点 Latency & DNS Benchmark 测速 View
   if (activeTab === 'latency') {
     const targets = data.targets || [];
+    const dnsServers = data.dns_servers || [];
+
     return (
       <div className="card-grid">
-        <GlassCard title="国内外核心节点响应耗时测速" icon={<Icons.Zap />}>
+        <GlassCard title="国内外核心节点 HTTP 响应测速" icon={<Icons.Zap />}>
           {targets.map((t, idx) => (
             <InfoRow
               key={idx}
@@ -455,9 +467,26 @@ function DiagnosisView({ data, activeTab, onCopy }) {
             />
           ))}
         </GlassCard>
+
+        <GlassCard title="主流公共 DNS 解析耗时 Benchmark (dig)" icon={<Icons.Globe />}>
+          {dnsServers.length > 0 ? (
+            dnsServers.map((d, idx) => (
+              <InfoRow
+                key={idx}
+                label={d.name}
+                val={d.ok ? `${d.latency} ms (${d.ip_result || '解析正常'})` : '解析超时'}
+                status={!d.ok ? 'bad' : d.latency < 50 ? 'good' : d.latency < 120 ? 'warn' : 'bad'}
+                onCopy={onCopy}
+              />
+            ))
+          ) : (
+            <InfoRow label="DNS 竞速" val="正在并发评估 5 大公共 DNS..." status="info" onCopy={onCopy} />
+          )}
+        </GlassCard>
       </div>
     );
   }
+
 
   // 4. 代理 & VPN View
   if (activeTab === 'proxy') {
