@@ -4,8 +4,8 @@
    ============================================================ */
 
 :root {
-  --bg:           #090d16;
-  --bg-subtle:    #0d1424;
+  --bg:           #000000;
+  --bg-subtle:    #0a0a0a;
   --surface:      rgba(15, 23, 42, 0.75);
   --card:         rgba(21, 32, 54, 0.6);
   --card-hover:   rgba(30, 45, 74, 0.75);
@@ -263,10 +263,7 @@ html {
 body {
   font-family: var(--font);
   background: var(--bg);
-  background-image: 
-    radial-gradient(at 50% 0%, #172554 0px, transparent 60%),
-    radial-gradient(at 100% 100%, #1e1b4b 0px, transparent 50%);
-  background-attachment: fixed;
+  background-image: none;
   color: var(--text);
   line-height: 1.5;
   min-height: 100vh;
@@ -297,7 +294,7 @@ body {
 /* Header */
 .app-header {
   border-bottom: 1px solid var(--border);
-  background: rgba(9, 13, 22, 0.85);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(16px);
   padding: 20px 32px;
   position: sticky;
@@ -370,7 +367,7 @@ body {
 
 /* Status Bar */
 .status-banner {
-  background: rgba(13, 20, 34, 0.9);
+  background: rgba(0, 0, 0, 0.9);
   border-bottom: 1px solid var(--border);
   padding: 8px 32px;
   font-size: 0.82rem;
@@ -720,7 +717,7 @@ body {
   color: var(--muted);
   font-size: 0.8rem;
   border-top: 1px solid var(--border);
-  background: rgba(9, 13, 22, 0.8);
+  background: rgba(0, 0, 0, 0.8);
   margin-top: auto;
 }
 
