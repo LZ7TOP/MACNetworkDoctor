@@ -3,6 +3,8 @@
 import asyncio
 import time
 
+from typing import Optional
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -111,7 +113,7 @@ async def api_hosts():
     return await check_hosts()
 
 
-async def _extract_password(request: Request) -> str | None:
+async def _extract_password(request: Request) -> Optional[str]:
     try:
         body = await request.json()
         return body.get("password") if isinstance(body, dict) else None
