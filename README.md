@@ -53,6 +53,7 @@ network-doctor/
 ## 快速开始
 
 ### 依赖环境
+
 - **操作系统**：macOS (推荐 macOS 12+)
 - **Python**：Python 3.8+
 - **浏览器**：Chrome / Safari / Firefox / Edge
@@ -60,13 +61,16 @@ network-doctor/
 ### 启动步骤
 
 1. **直接运行一键启动脚本 (推荐)**：
+
    ```bash
    chmod +x start.sh
    ./start.sh
    ```
-   *脚本会自动检查并释放 19999 端口占用，并开启 Web 控制台。*
+
+   _脚本会自动检查并释放 19999 端口占用，并开启 Web 控制台。_
 
 2. **或使用 Python 手动启动**：
+
    ```bash
    # 安装依赖
    pip install -r requirements.txt
@@ -86,28 +90,27 @@ network-doctor/
 
 ### 诊断数据接口 (GET)
 
-| 接口地址 | 说明 | 诊断内容 |
-| :--- | :--- | :--- |
-| `GET /api/diagnose` | **全面并发诊断** | 并发执行所有模块检查并计算系统健康指数 |
-| `GET /api/check/network` | 网络基础检查 | 活跃接口、IP 地址、默认网关与连通性 |
-| `GET /api/check/latency` | 核心节点测速 | 国内外主流 HTTP 站点响应耗时 |
-| `GET /api/check/dns-benchmark` | 公共 DNS 竞速 | 阿里、腾讯、Cloudflare 等 DNS 解析速度对比 |
-| `GET /api/check/proxy` | 代理与 VPN 检测 | 系统代理状态、活动代理进程与监听端口 |
-| `GET /api/check/extensions` | 网络扩展检查 | 系统网络扩展及其可疑状态检测 |
-| `GET /api/check/chrome` | Chrome DoH 检查 | Chrome Secure DoH 设置及运行状态 |
-| `GET /api/check/hosts` | Hosts 条目分析 | `/etc/hosts` 中非默认域名重定向解析 |
+| 接口地址                       | 说明             | 诊断内容                                   |
+| :----------------------------- | :--------------- | :----------------------------------------- |
+| `GET /api/diagnose`            | **全面并发诊断** | 并发执行所有模块检查并计算系统健康指数     |
+| `GET /api/check/network`       | 网络基础检查     | 活跃接口、IP 地址、默认网关与连通性        |
+| `GET /api/check/latency`       | 核心节点测速     | 国内外主流 HTTP 站点响应耗时               |
+| `GET /api/check/dns-benchmark` | 公共 DNS 竞速    | 阿里、腾讯、Cloudflare 等 DNS 解析速度对比 |
+| `GET /api/check/proxy`         | 代理与 VPN 检测  | 系统代理状态、活动代理进程与监听端口       |
+| `GET /api/check/extensions`    | 网络扩展检查     | 系统网络扩展及其可疑状态检测               |
+| `GET /api/check/chrome`        | Chrome DoH 检查  | Chrome Secure DoH 设置及运行状态           |
+| `GET /api/check/hosts`         | Hosts 条目分析   | `/etc/hosts` 中非默认域名重定向解析        |
 
 ### 一键修复接口 (POST)
 
-| 接口地址 | 说明 | 底层操作命令 |
-| :--- | :--- | :--- |
-| `POST /api/fix/flush-dns` | 刷新 macOS 系统 DNS 缓存 | `dscacheutil -flushcache; killall -HUP mDNSResponder` |
+| 接口地址                      | 说明                     | 底层操作命令                                                       |
+| :---------------------------- | :----------------------- | :----------------------------------------------------------------- |
+| `POST /api/fix/flush-dns`     | 刷新 macOS 系统 DNS 缓存 | `dscacheutil -flushcache; killall -HUP mDNSResponder`              |
 | `POST /api/fix/disable-proxy` | 强制关停活动接口系统代理 | `networksetup -setwebproxystate / -setsecurewebproxystate ... off` |
-| `POST /api/fix/flush-arp` | 清理 ARP 路由表缓存 | `sudo arp -d -a` |
-| `POST /api/fix/chrome-dns` | 修复 Chrome 安全 DNS | 修改 Chrome `Local State` 文件中 `dns_over_https.mode` 为 `"off"` |
+| `POST /api/fix/flush-arp`     | 清理 ARP 路由表缓存      | `sudo arp -d -a`                                                   |
+| `POST /api/fix/chrome-dns`    | 修复 Chrome 安全 DNS     | 修改 Chrome `Local State` 文件中 `dns_over_https.mode` 为 `"off"`  |
 
 ---
-
 
 ## Git 提交规范 (Commit Standards)
 
