@@ -111,6 +111,14 @@ async def api_hosts():
     return await check_hosts()
 
 
+async def _extract_password(request: Request) -> str | None:
+    try:
+        body = await request.json()
+        return body.get("password") if isinstance(body, dict) else None
+    except Exception:
+        return None
+
+
 # ── API: Quick Fix Actions ────────────────────────────────────
 @app.post("/api/fix-chrome")
 @app.post("/api/fix/chrome-dns")
@@ -119,23 +127,27 @@ async def api_fix_chrome():
 
 
 @app.post("/api/fix/flush-dns")
-async def api_flush_dns():
-    return await flush_dns()
+async def api_flush_dns(request: Request):
+    pwd = await _extract_password(request)
+    return await flush_dns(password=pwd)
 
 
 @app.post("/api/fix/disable-proxy")
-async def api_disable_proxy():
-    return await disable_system_proxy()
+async def api_disable_proxy(request: Request):
+    pwd = await _extract_password(request)
+    return await disable_system_proxy(password=pwd)
 
 
 @app.post("/api/fix/flush-arp")
-async def api_flush_arp():
-    return await flush_arp()
+async def api_flush_arp(request: Request):
+    pwd = await _extract_password(request)
+    return await flush_arp(password=pwd)
 
 
 @app.post("/api/fix/renew-dhcp")
-async def api_renew_dhcp():
-    return await renew_dhcp()
+async def api_renew_dhcp(request: Request):
+    pwd = await _extract_password(request)
+    return await renew_dhcp(password=pwd)
 
 
 @app.post("/api/check/port")

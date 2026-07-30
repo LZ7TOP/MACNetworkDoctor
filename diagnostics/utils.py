@@ -65,6 +65,16 @@ async def run(cmd: str, *, timeout: float = 12.0, cache: bool = False) -> ShellR
     return result
 
 
+async def run_sudo(cmd: str, password: str = None, timeout: float = 12.0) -> ShellResult:
+    """Execute a command with sudo, supplying password via pipe if provided."""
+    if password:
+        safe_pass = password.replace("'", "'\\''")
+        full_cmd = f"echo '{safe_pass}' | sudo -S {cmd} 2>&1"
+    else:
+        full_cmd = f"sudo -n {cmd} 2>/dev/null || {cmd}"
+    return await run(full_cmd, timeout=timeout)
+
+
 def parse_kv(text: str) -> dict[str, str]:
     """Parse simple key: value lines into a dict."""
     out = {}

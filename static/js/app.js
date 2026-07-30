@@ -93,6 +93,11 @@ const Icons = {
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
     </svg>
+  ),
+  Lock: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
   )
 };
 
@@ -199,6 +204,8 @@ function App() {
   const [status, setStatus] = useState({ text: '准备就绪 — 选择诊断项或执行一键修复', type: 'idle' });
   const [clock, setClock] = useState('');
   const [toast, setToast] = useState(null);
+  const [pwdModal, setPwdModal] = useState({ isOpen: false, fixType: null, errorMsg: '' });
+  const [cachedPassword, setCachedPassword] = useState('');
 
   // Calculate Health Score
   const healthScore = useMemo(() => {
@@ -254,59 +261,48 @@ function App() {
     setStatus({ text: '检测完成', type: hasError ? 'warn' : 'ok' });
   }, []);
 
-  const handleQuickFix = async (fixType) => {
-    if (fixType === 'flush-dns') {
-      setStatus({ text: '正在刷新系统 DNS 缓存...', type: 'warn' });
-      setLoading(true);
-      const res = await fetchApi('/fix/flush-dns', { method: 'POST' });
-      setLoading(false);
-      if (res.success) {
-        showToast('DNS 缓存已成功刷新');
-        setStatus({ text: 'DNS 缓存刷新完毕', type: 'ok' });
-      } else {
-        setStatus({ text: '刷新失败: ' + (res.error || '未知错误'), type: 'bad' });
-      }
-    } else if (fixType === 'disable-proxy') {
-      if (!window.confirm('此操作将重置并关停所有活动网卡的系统代理设置，确定继续？')) return;
-      setStatus({ text: '正在清理关停系统代理...', type: 'warn' });
-      setLoading(true);
-      const res = await fetchApi('/fix/disable-proxy', { method: 'POST' });
-      setLoading(false);
-      if (res.success) {
-        showToast(res.message);
-        setStatus({ text: '系统代理关停成功', type: 'ok' });
-      } else {
-        setStatus({ text: '操作失败: ' + (res.error || '未知错误'), type: 'bad' });
-      }
-    } else if (fixType === 'flush-arp') {
-      setStatus({ text: '正在清理 ARP 缓存...', type: 'warn' });
-      setLoading(true);
-      const res = await fetchApi('/fix/flush-arp', { method: 'POST' });
-      setLoading(false);
-      if (res.success) {
-        showToast('ARP 路由表缓存已重置清理');
-        setStatus({ text: 'ARP 缓存清理成功', type: 'ok' });
-      }
-    } else if (fixType === 'renew-dhcp') {
-      setStatus({ text: '正在重置网卡 DHCP 租约...', type: 'warn' });
-      setLoading(true);
-      const res = await fetchApi('/fix/renew-dhcp', { method: 'POST' });
-      setLoading(false);
-      if (res.success) {
-        showToast(res.message);
-        setStatus({ text: 'DHCP 重置成功', type: 'ok' });
-      }
-    } else if (fixType === 'chrome-dns') {
-      if (!window.confirm('确定将 Chrome 安全 DNS 强制重置为 off？\n\n请确保已退出 Chrome (Cmd+Q)。')) return;
-      setStatus({ text: '正在重置 Chrome DNS...', type: 'warn' });
-      setLoading(true);
-      const res = await fetchApi('/fix/chrome-dns', { method: 'POST' });
-      setLoading(false);
-      if (res.success) {
-        showToast('Chrome 安全 DNS 已修复为 off');
-        setStatus({ text: 'Chrome DNS 修复成功', type: 'ok' });
-      } else {
-        setStatus({ text: '修复失败: ' + (res.error || '未知错误'), type: 'bad' });
+  const handleQuickFix = async (fixType, password = cachedPassword) => {
+    let endpoint = '/fix/' + fixType;
+    if (fixType === 'chrome-dns') endpoint = '/fix/chrome-dns';
+
+    if (fixType === 'disable-proxy' && !password && !window.confirm('此操作将重置并关停所有活动网卡的系统代理设置，确定继续？')) return;
+    if (fixType === 'chrome-dns' && !password && !window.confirm('确定将 Chrome 安全 DNS 强制重置为 off？\n\n请确保已退出 Chrome (Cmd+Q)。')) return;
+
+    const fixLabels = {
+      'flush-dns': '正在刷新系统 DNS 缓存...',
+      'disable-proxy': '正在关停系统代理...',
+      'flush-arp': '正在清理 ARP 缓存...',
+      'renew-dhcp': '正在重置网卡 DHCP 租约...',
+      'chrome-dns': '正在重置 Chrome DNS...',
+    };
+
+    setStatus({ text: fixLabels[fixType] || '正在执行修复...', type: 'warn' });
+    setLoading(true);
+
+    const bodyData = password ? JSON.stringify({ password }) : JSON.stringify({});
+    const res = await fetchApi(endpoint, {
+      method: 'POST',
+      body: bodyData,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    setLoading(false);
+
+    if (res.need_sudo_password) {
+      setPwdModal({ isOpen: true, fixType, errorMsg: res.error || '该提权命令需要输入 macOS 管理员密码' });
+      setStatus({ text: '需要管理员密码认证', type: 'warn' });
+      return;
+    }
+
+    if (res.success) {
+      if (password) setCachedPassword(password);
+      setPwdModal({ isOpen: false, fixType: null, errorMsg: '' });
+      showToast(res.message || '修复成功');
+      setStatus({ text: res.message || '修复成功', type: 'ok' });
+    } else {
+      setStatus({ text: '修复失败: ' + (res.error || '未知错误'), type: 'bad' });
+      if (password) {
+        setPwdModal({ isOpen: true, fixType, errorMsg: '密码不正确，请重新输入' });
       }
     }
   };
@@ -514,9 +510,69 @@ function App() {
         MACNetworkDoctor macOS Engine v1.6 · React SPA · <a href="https://github.com/LZ7TOP/MACNetworkDoctor" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>GitHub 主页</a>
       </footer>
 
+      {/* Sudo Password Modal */}
+      <SudoPasswordModal
+        isOpen={pwdModal.isOpen}
+        errorMsg={pwdModal.errorMsg}
+        onSubmit={(pass) => handleQuickFix(pwdModal.fixType, pass)}
+        onCancel={() => setPwdModal({ isOpen: false, fixType: null, errorMsg: '' })}
+      />
+
       {/* Toast Notification */}
       {toast && <div className="toast-msg">{toast}</div>}
     </>
+  );
+}
+
+// ── Sudo Password Modal Component ───────────────────────────
+function SudoPasswordModal({ isOpen, onSubmit, onCancel, errorMsg }) {
+  const [inputPass, setInputPass] = useState('');
+  if (!isOpen) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!inputPass) return;
+    onSubmit(inputPass);
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-card">
+        <div className="modal-title">
+          <Icons.Lock /> <span>macOS 管理员权限认证</span>
+        </div>
+        <p className="modal-desc">
+          当前修复操作需要使用 <code style={{ fontFamily: 'var(--mono)', color: '#60a5fa' }}>sudo</code> 权限提权。请输入当前 macOS 用户的管理员密码：
+        </p>
+        {errorMsg && (
+          <div className="alert-box bad" style={{ padding: '8px 12px', fontSize: '0.82rem', marginBottom: '14px' }}>
+            {errorMsg}
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
+          <input
+            type="password"
+            className="modal-input"
+            value={inputPass}
+            onChange={(e) => setInputPass(e.target.value)}
+            placeholder="输入 macOS 登录密码 (仅用于本次命令提权)"
+            autoFocus
+          />
+          <div className="modal-actions">
+            <button type="button" className="action-btn" onClick={onCancel}>
+              取消
+            </button>
+            <button
+              type="submit"
+              className="action-btn"
+              style={{ background: 'var(--blue)', color: '#ffffff', borderColor: 'var(--blue)' }}
+            >
+              确认提权修复
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
 
