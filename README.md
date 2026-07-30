@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="static/logo.svg" width="140" height="140" alt="MACNetworkDoctor Logo" />
+
 # 🩺 MACNetworkDoctor
 
 ### Mac 专业级网络诊断与一键修复 Web 控制台
@@ -18,41 +20,16 @@
 
 ## 📖 项目介绍
 
-`MACNetworkDoctor` 是一款专为 macOS 开发者、运维人员与系统管理员打造的高性能网络排错与一键修复控制台。通过 Python 异步并发诊断引擎与现代 **React 18** 响应式单页应用 (SPA)，全面解决开发测试中常见的系统代理遗留、VPN 断流、DNS 解析污染、Chrome Secure DoH 阻断、TCP 端口握手失败以及 `/etc/hosts` 重定向异常。
+`MACNetworkDoctor` 是一款专为 macOS 开发者、运维人员与系统管理员打造的高性能网络排错与一键修复控制台。通过 Python 异步并发诊断引擎与现代 **React 18** 响应式单页应用 (SPA)，全面排查与自动修复日常开发测试中常见的系统代理残留、VPN 断流、DNS 解析污染、Chrome Secure DoH 阻断、TCP 端口握手超时以及 `/etc/hosts` 自定义重定向异常。
 
-无论是在办公网、代理环境还是纯隔离无网局域网下，`MACNetworkDoctor` 均能实现**毫秒级并发排查**并提供**一键快捷修复**与 **Markdown 诊断报告导出**功能。
-
----
-
-## 🛠️ 技术栈 (Tech Stack)
-
-### 1. 后端服务与异步引擎 (Backend)
-- **Python 3.8+**：底层核心开发语言，提供系统级 CLI 管道交互与并发处理能力。
-- **FastAPI (≥ 0.115.0)**：高性能 RESTful 异步 API 框架，内置自动类型校验与轻量 JSON 响应。
-- **Uvicorn (≥ 0.32.0)**：基于 `asyncio` 的 ASGI 服务器，集成极速代码热重载 (Hot Reload) 与 API 请求中间件。
-- **aiofiles (≥ 24.0.0)**：异步非阻塞文件 I/O 读写库，用于安全解析与修改 Chrome 配置及本地文件。
-- **asyncio (Python Standard Library)**：原生并发任务调度器，利用 `asyncio.gather` 实现多维度网络诊断毫秒级并发探测与结果汇总。
-
-### 2. 前端界面与 UI (Frontend)
-- **React 18 (Component & Hooks)**：纯正 React 18 驱动的单页应用 (SPA)，采用全 Hooks 状态流管理。
-- **Babel Standalone (v7)**：本地化实时 JSX 渲染解析引擎（位于 `static/vendor/`）。
-- **Vanilla Modern CSS**：自定义 Glassmorphism 拟态暗黑 / 浅色双模设计，结合 CSS 自定义变量 (`--bg-primary`, `--accent-blue`)、Flex/Grid 响应式布局与极致的高对比度调色盘。
-- **Lucide Vector Icons**：全矢量现代 SVG 图标集，提供无损高清晰度 UI 元素表现。
-- **Zero CDN & Off-line Ready**：所有前端依赖静态资源（React, ReactDOM, Babel）全量放置于 `static/vendor/` 目录，完全脱离外部网络 CDN 限制，支持纯离线隔离环境部署。
-
-### 3. 系统底层诊断工具 (Native Diagnostics Engine)
-- **macOS System CLI Core**：深度集成 macOS 系统原生指令集：
-  - `ifconfig` / `scutil` / `networksetup`：链路接口状态、路由 IP 分配与系统 HTTP/HTTPS/SOCKS 代理探测。
-  - `ping` / `curl` / `dig`：物理链路延迟、HTTP/HTTPS 握手耗时与公共 DNS 解析竞速测试。
-  - `lsof`：端口与活动代理进程监听扫描（自动检测 Clash, Surge, Shadowrocket 等应用）。
-  - `dscacheutil` / `mDNSResponder` / `arp`：系统 DNS 缓存刷洗与 ARP 路由表重置。
+无论是在日常办公网、代理加速环境还是纯隔离无网局域网下，`MACNetworkDoctor` 均能实现**毫秒级并发排查**并提供**一键快捷修复**与 **Markdown 诊断报告导出**功能。
 
 ---
 
 ## ✨ 核心特性亮点
 
 - ⚡ **React 18 现代化控制台**：纯正 React 18 Component + Hooks 状态流驱动，搭配 Linear / Vercel 风格 Glassmorphism 拟态界面与全矢量 SVG 图标。
-- 🎨 **三模极速主题引擎**：内置 **浅色 (Light)**、**深色 (Dark)** 与 **系统跟随 (System)** 3 种主题无缝切换，高对比度色彩适配，极致视觉体验。
+- 🎨 **三模极速主题引擎**：内置 **纯黑深色 (OLED Dark)**、**浅色 (Light)** 与 **系统跟随 (System)** 3 种主题无缝切换，高对比度色彩适配，极致视觉体验。
 - 📦 **纯离线 / 零 CDN 依赖**：前端 React 18、ReactDOM 18 与 Babel 依赖全量静态本地化（放置于 `static/vendor/`），在无网或局域网隔离环境下依旧完美渲染运行。
 - 📄 **Markdown 诊断报告导出**：一键导出并生成标准 Markdown 格式的网络诊断报告，清晰汇总系统健康分、网络接口状态、DNS 延迟竞速等数据，方便排障记录与分享。
 - 🩺 **全维度异步并发诊断**：内置 macOS 原生 CLI 诊断引擎（`ifconfig`, `scutil`, `networksetup`, `lsof`, `dig`, `ping`, `curl`），支持 6 大核心模块毫秒级并发排查。
@@ -68,6 +45,24 @@
   - 并发测速 5 大主流公共 DNS 解析延迟并实时推荐最优服务器。
 - 💻 **Terminal 终端代理 export 命令生成**：自动检测 Clash / Surge 等本地代理监听端口，生成一键复制命令供终端一键启用代理。
 - 🔄 **代码热更新 (Hot Reload Enabled)**：服务继承 Uvicorn 热更新引擎，内置端口冲突检测与优雅清理中间件。
+
+---
+
+## 🛠️ 技术栈 (Tech Stack)
+
+| 层级 | 技术方案 | 描述与主要用途 |
+| :--- | :--- | :--- |
+| **Backend** | **Python 3.8+** | 底层核心开发语言，提供系统级 CLI 管道交互与并发处理能力 |
+| | **FastAPI (≥ 0.115.0)** | 高性能 RESTful 异步 API 框架，内置自动类型校验与轻量 JSON 响应 |
+| | **Uvicorn (≥ 0.32.0)** | 基于 `asyncio` 的 ASGI 服务器，集成极速代码热重载 (Hot Reload) 与请求日志中间件 |
+| | **aiofiles (≥ 24.0.0)** | 异步非阻塞文件 I/O 读写库，用于安全解析与修改 Chrome 配置及本地文件 |
+| | **asyncio** | 原生并发任务调度器，利用 `asyncio.gather` 实现多维度网络诊断毫秒级并发探测 |
+| **Frontend** | **React 18** | Component & Hooks 驱动的单页应用 (SPA)，全状态流无缝交互 |
+| | **Babel Standalone (v7)** | 本地化实时 JSX 渲染解析引擎（位于 `static/vendor/`） |
+| | **Vanilla Modern CSS** | 自定义 Pure Black Glassmorphism 拟态与浅色双模设计，结合 CSS 自定义变量与 Grid 响应式布局 |
+| | **Lucide Vector Icons** | 全矢量现代 SVG 图标集，提供无损高清晰度 UI 元素表现 |
+| | **Zero CDN / Offline Ready** | 前端静态资源全量本地化，完全脱离外部网络 CDN 限制，支持纯离线隔离环境部署 |
+| **Engine** | **macOS Native CLI Core** | 深度集成 `ifconfig`, `scutil`, `networksetup`, `lsof`, `dig`, `ping`, `curl`, `arp`, `dscacheutil` |
 
 ---
 
@@ -88,8 +83,9 @@ MACNetworkDoctor/
 │   ├── fix.py             # 快捷修复工具 (DNS/Proxy/ARP/Chrome/DHCP)
 │   └── utils.py           # 异步 Shell 运行器与 TTL 缓存机制
 ├── static/                # React 18 前端静态资源
+│   ├── logo.svg           # 矢量 SVG 专属品牌 Logo 图标
 │   ├── index.html         # 单页应用挂载入口
-│   ├── css/app.css        # Linear 风格 Glassmorphism 与多主题 CSS 规则
+│   ├── css/app.css        # Pure Black 纯黑 Glassmorphism 与多主题 CSS 规则
 │   ├── js/app.js          # React 18 组件化 SPA 逻辑与报告导出
 │   └── vendor/            # React 18, ReactDOM 18, Babel 本地依赖
 ├── run.py                 # Python 启动入口 (支持自动依赖安装与 Hot Reload)
