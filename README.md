@@ -34,12 +34,15 @@
 - 📄 **Markdown 诊断报告导出**：一键导出并生成标准 Markdown 格式的网络诊断报告，清晰汇总系统健康分、网络接口状态、DNS 延迟竞速等数据，方便排障记录与分享。
 - 🩺 **全维度异步并发诊断**：内置 macOS 原生 CLI 诊断引擎（`ifconfig`, `scutil`, `networksetup`, `lsof`, `dig`, `ping`, `curl`），支持 6 大核心模块毫秒级并发排查。
 - 🔌 **TCP 端口握手探测**：支持自定义指定 Host 与 Port 进行 TCP 三次握手测试与延迟毫秒级测量，精准检测端口开放状态。
+- 🔐 **Web 端 Sudo 提权密码认证**：当一键修复指令需要 macOS 管理员 (`sudo`) 权限时，控制台自动唤起 `SudoPasswordModal` 认证窗口，支持在浏览器中直接输入密码安全提权与自动重试。
+- 💬 **全自定义高颜值 Modal 弹窗**：彻底弃用原生丑陋的浏览器 `window.confirm()` / `window.alert()` 提示，全量换用项目中封装的 Glassmorphism 暗黑拟态二次确认对话框。
 - 🔧 **一键修复工具箱 (Quick-Fix Toolbox)**：
   - **刷新系统 DNS 缓存**：调用 `dscacheutil` 与 `mDNSResponder` 彻底更新域名解析记录。
   - **一键关停系统代理**：自动扫描所有活动网卡并强制关闭 HTTP/HTTPS/SOCKS/PAC 代理。
   - **重置 Chrome 安全 DNS (DoH)**：解析并自动修复 Chrome `Local State` 中强制 Secure DoH 造成的域名卡顿。
   - **清理 ARP 路由表缓存**：快速重置 ARP 缓存，解决路由器更换或局域网 MAC 地址碰撞问题。
   - **重置网卡 DHCP 动态租约**：自动触发主网卡 DHCP 租约重置，快速恢复 IP 地址分配。
+- 🛡️ **广域代理与多协议 VPN 检索**：实时检索包含 Surge、Clash、Stash、WireGuard、Tailscale、ZeroTier、OpenVPN 在内的代理软件与虚拟网络扩展。
 - 📊 **节点响应与 DNS 竞速测试 (Benchmark)**：
   - 并发测速国内外主流 HTTP 站点 (百度, 淘宝, GitHub, Cloudflare 1.1.1.1, Google 8.8.8.8)。
   - 并发测速 5 大主流公共 DNS 解析延迟并实时推荐最优服务器。
