@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Network Doctor — 启动入口（支持开发热更新）"""
+"""MACNetworkDoctor — 启动入口（支持开发热更新）"""
 
 import subprocess
 import sys
@@ -21,7 +21,7 @@ def main():
 
     print()
     print("┌──────────────────────────────────────────────────────────┐")
-    print("│             Network Doctor — Web 控制台 v1.6             │")
+    print("│            MACNetworkDoctor — Web 控制台 v1.6            │")
     print("├──────────────────────────────────────────────────────────┤")
     print("│  本地访问: http://localhost:19999                         │")
     print("│  开发状态: 代码热更新 (Hot Reload Enabled)               │")

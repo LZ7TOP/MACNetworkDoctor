@@ -1,4 +1,4 @@
-"""FastAPI application — async endpoints for the network doctor dashboard."""
+"""FastAPI application — async endpoints for the MACNetworkDoctor dashboard."""
 
 import asyncio
 import time
@@ -25,7 +25,7 @@ from diagnostics import (
 )
 
 
-app = FastAPI(title="Network Doctor", version="1.6.0", docs_url=None, redoc_url=None)
+app = FastAPI(title="MACNetworkDoctor", version="1.6.0", docs_url=None, redoc_url=None)
 
 
 # ── Terminal Logger Middleware ──────────────────────────────

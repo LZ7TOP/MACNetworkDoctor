@@ -1,5 +1,5 @@
 /* ============================================================
-   Network Doctor — React 18 Single Page Application
+   MACNetworkDoctor — React 18 Single Page Application
    No-Emoji Pure SVG Icons, Unified Tab Selection & Complete Views
    ============================================================ */
 
@@ -304,7 +304,7 @@ function App() {
   const exportReport = () => {
     if (!data) return;
     const timeStr = new Date().toLocaleString('zh-CN');
-    let report = `# Network Doctor — 排错诊断报告\n\n> 导出时间: ${timeStr}\n> 健康评估指数: ${healthScore} / 100\n\n`;
+    let report = `# MACNetworkDoctor — 排错诊断报告\n\n> 导出时间: ${timeStr}\n> 健康评估指数: ${healthScore} / 100\n\n`;
 
     if (data.network) {
       report += `### 1. 基础网络连通性\n`;
@@ -332,7 +332,7 @@ function App() {
     const blob = new Blob([report], { type: 'text/markdown;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `Network-Doctor-Report-${Date.now()}.md`;
+    link.download = `MACNetworkDoctor-Report-${Date.now()}.md`;
     link.click();
 
     showToast('诊断报告 .md 已成功导出下载');
@@ -365,7 +365,7 @@ function App() {
               <Icons.Activity />
             </div>
             <div className="brand-title">
-              <h1>Network Doctor</h1>
+              <h1>MACNetworkDoctor</h1>
               <p>Mac 专业级网络诊断控制台 · React Powered</p>
             </div>
           </div>
@@ -481,7 +481,7 @@ function App() {
 
       {/* Footer */}
       <footer className="app-footer">
-        Network Doctor macOS Engine v1.6 · React SPA
+        MACNetworkDoctor macOS Engine v1.6 · React SPA
       </footer>
 
       {/* Toast Notification */}

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Network Doctor — 一键启动与热更新控制脚本
+# MACNetworkDoctor — 一键启动与热更新控制脚本
 
 cd "$(dirname "$0")"
 
@@ -14,6 +14,6 @@ if [ -n "$PID" ]; then
   sleep 0.5
 fi
 
-echo "启动 Network Doctor Web 控制台 (已启用代码热更新)..."
+echo "启动 MACNetworkDoctor Web 控制台 (已启用代码热更新)..."
 python3 run.py
 

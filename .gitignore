@@ -28,8 +28,11 @@ wheels/
 .LSOverride
 ._*
 
-# IDE
+# IDE & Logs
 .vscode/
 .idea/
 *.swp
 *.swo
+*.log
+.pytest_cache/
+
