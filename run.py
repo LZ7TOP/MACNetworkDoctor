@@ -21,11 +21,11 @@ def main():
 
     print()
     print("┌──────────────────────────────────────────────────────────┐")
-    print("│            MACNetworkDoctor — Web 控制台 v1.6            │")
+    print("│         MACNetworkDoctor — macOS 网络诊断控制台 v1.6       │")
     print("├──────────────────────────────────────────────────────────┤")
-    print("│  本地访问: http://localhost:19999                         │")
-    print("│  开发状态: 代码热更新 (Hot Reload Enabled)               │")
-    print("│  退出控制: 按 Ctrl+C 终止运行                             │")
+    print("│  Web 控制台访问地址: http://localhost:19999              │")
+    print("│  运行模式: 极速热重载 (Hot Reload Enabled)               │")
+    print("│  终止运行: 终端按 Ctrl+C 退出控制台                       │")
     print("└──────────────────────────────────────────────────────────┘")
     print()
 

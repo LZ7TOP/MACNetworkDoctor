@@ -6,12 +6,12 @@ import os
 from diagnostics.utils import run
 
 PROXY_APPS = [
-    "Shadowrocket", "Surge", "Clash", "ClashX", "V2Ray", "Xray",
-    "Trojan", "Quantum", "karing", "mihomo", "SFM", "aTrust",
-    "sing-box", "Hysteria", "NekoRay", "Nekoray",
+    "Shadowrocket", "Surge", "Clash", "ClashX", "Clash Verge", "Stash", "V2Ray", "Xray",
+    "Trojan", "Quantumult", "karing", "mihomo", "SFM", "aTrust", "EasyConnect",
+    "sing-box", "Hysteria", "NekoRay", "Nekoray", "WireGuard", "Tailscale", "ZeroTier", "OpenVPN",
 ]
 
-PROXY_PORTS = ":(1080|1087|7890|7891|8118|9090|2080|2333|2334) "
+PROXY_PORTS = ":(1080|1087|7890|7891|7897|8118|9090|2080|2333|2334) "
 
 
 async def check_proxy() -> dict:

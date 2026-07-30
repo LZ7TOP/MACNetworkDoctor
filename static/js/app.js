@@ -338,6 +338,16 @@ function App() {
       report += `- DoH 模式: ${data.chrome_dns.mode || 'not_set'}\n\n`;
     }
 
+    if (data.hosts && data.hosts.entries) {
+      report += `### 4. /etc/hosts 自定义解析记录\n`;
+      report += `- 条目总数: ${data.hosts.entries.length} 条\n\n`;
+    }
+
+    if (data.extensions && data.extensions.extensions) {
+      report += `### 5. 系统网络扩展状态\n`;
+      report += `- 已加载扩展: ${data.extensions.extensions.length} 个\n\n`;
+    }
+
     // Download .md file
     const blob = new Blob([report], { type: 'text/markdown;charset=utf-8;' });
     const link = document.createElement('a');
@@ -376,7 +386,7 @@ function App() {
             </div>
             <div className="brand-title">
               <h1>MACNetworkDoctor</h1>
-              <p>Mac 专业级网络诊断控制台 · React Powered</p>
+              <p>macOS 高性能网络诊断与一键修复控制台</p>
             </div>
           </div>
 

@@ -33,7 +33,10 @@ async def disable_system_proxy() -> dict:
         await asyncio.gather(*[run(c) for c in cmds])
         modified.append(s)
 
-    return {"success": True, "services": modified, "message": f"已关停 {len(modified)} 个网络接口的系统代理"}
+    if not modified:
+        return {"success": True, "services": [], "message": "所有网络接口均已处于无代理直连状态"}
+
+    return {"success": True, "services": modified, "message": f"已成功强制关停 {len(modified)} 个活动网卡接口的系统代理"}
 
 
 async def flush_arp() -> dict:
