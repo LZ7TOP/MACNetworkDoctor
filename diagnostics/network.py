@@ -1,5 +1,7 @@
 """Network basics: interfaces, IP, gateway, DNS, connectivity."""
 
+import asyncio
+import re
 from diagnostics.utils import run
 
 
@@ -87,5 +89,37 @@ async def benchmark_dns() -> dict:
     import asyncio
     results = await asyncio.gather(*[_test_dns(n, s) for n, s in dns_servers])
     return {"dns_servers": results}
+
+
+async def check_port(host: str, port: int) -> dict:
+    """Test TCP socket connection to a specific host and port."""
+    import time
+    t0 = time.time()
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(host, port),
+            timeout=3.0
+        )
+        dt = int((time.time() - t0) * 1000)
+        writer.close()
+        await writer.wait_closed()
+        return {
+            "host": host,
+            "port": port,
+            "open": True,
+            "latency": dt,
+            "message": f"成功建立 TCP 握手 ({dt} ms)"
+        }
+    except Exception as e:
+        dt = int((time.time() - t0) * 1000)
+        return {
+            "host": host,
+            "port": port,
+            "open": False,
+            "latency": dt,
+            "error": str(e) or "连接超时或拒绝",
+            "message": "TCP 端口未开放或建立握手失败"
+        }
+
 
 

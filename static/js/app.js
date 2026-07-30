@@ -277,6 +277,15 @@ function App() {
         showToast('ARP 路由表缓存已重置清理');
         setStatus({ text: 'ARP 缓存清理成功', type: 'ok' });
       }
+    } else if (fixType === 'renew-dhcp') {
+      setStatus({ text: '正在重置网卡 DHCP 租约...', type: 'warn' });
+      setLoading(true);
+      const res = await fetchApi('/fix/renew-dhcp', { method: 'POST' });
+      setLoading(false);
+      if (res.success) {
+        showToast(res.message);
+        setStatus({ text: 'DHCP 重置成功', type: 'ok' });
+      }
     } else if (fixType === 'chrome-dns') {
       if (!window.confirm('确定将 Chrome 安全 DNS 强制重置为 off？\n\n请确保已退出 Chrome (Cmd+Q)。')) return;
       setStatus({ text: '正在重置 Chrome DNS...', type: 'warn' });
@@ -291,6 +300,44 @@ function App() {
       }
     }
   };
+
+  const exportReport = () => {
+    if (!data) return;
+    const timeStr = new Date().toLocaleString('zh-CN');
+    let report = `# Network Doctor — 排错诊断报告\n\n> 导出时间: ${timeStr}\n> 健康评估指数: ${healthScore} / 100\n\n`;
+
+    if (data.network) {
+      report += `### 1. 基础网络连通性\n`;
+      report += `- 活跃网卡接口: ${data.network.active_if || '未知'}\n`;
+      report += `- 本机 IP: ${data.network.ip || '未知'}\n`;
+      report += `- 默认网关: ${data.network.gateway || '未知'}\n`;
+      report += `- DNS 服务器: ${(data.network.dns || []).join(', ')}\n`;
+      report += `- 百度 Ping 状态: ${data.network.ping_baidu ? '可达' : '不可达'}\n\n`;
+    }
+
+    if (data.proxy) {
+      report += `### 2. 系统代理与 VPN\n`;
+      report += `- HTTP 代理: ${data.proxy.http_proxy ? '开启' : '关闭'}\n`;
+      report += `- SOCKS 代理: ${data.proxy.socks_proxy ? '开启' : '关闭'}\n`;
+      report += `- PAC 代理: ${data.proxy.pac_proxy ? '开启' : '关闭'}\n`;
+      report += `- 活动代理进程: ${(data.proxy.processes || []).length} 个\n\n`;
+    }
+
+    if (data.chrome_dns) {
+      report += `### 3. Chrome Secure DoH 配置\n`;
+      report += `- DoH 模式: ${data.chrome_dns.mode || 'not_set'}\n\n`;
+    }
+
+    // Download .md file
+    const blob = new Blob([report], { type: 'text/markdown;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Network-Doctor-Report-${Date.now()}.md`;
+    link.click();
+
+    showToast('诊断报告 .md 已成功导出下载');
+  };
+
 
   useEffect(() => {
     runDiagnostic('diagnose');
@@ -323,8 +370,12 @@ function App() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <button className="action-btn" onClick={exportReport} title="生成并导出 Markdown 网络诊断报告">
+              <Icons.Copy /> 导出诊断报告
+            </button>
             <ThemeSwitcher />
+
 
             <div className="gauge-card">
               <div className="gauge-ring">
@@ -405,11 +456,15 @@ function App() {
             <button className="action-btn" onClick={() => handleQuickFix('flush-arp')}>
               <Icons.Refresh /> 清理 ARP 缓存
             </button>
+            <button className="action-btn" onClick={() => handleQuickFix('renew-dhcp')}>
+              <Icons.Refresh /> 重置 DHCP
+            </button>
             <button className="action-btn danger-btn" onClick={() => handleQuickFix('chrome-dns')}>
               <Icons.Cpu /> 修复 Chrome DNS
             </button>
           </div>
         </div>
+
       </div>
 
       {/* Main Content Area */}
@@ -507,22 +562,84 @@ function DiagnosisView({ data, activeTab, onCopy }) {
     );
   }
 
-  // 2. 网络基础 View
+// ── Port Probe Helper Component ─────────────────────────────
+function PortProbe({ onCopy }) {
+  const [host, setHost] = useState('127.0.0.1');
+  const [port, setPort] = useState('8080');
+  const [testing, setTesting] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleTest = async (e) => {
+    e.preventDefault();
+    if (!host || !port) return;
+    setTesting(true);
+    setResult(null);
+    const res = await fetchApi('/check/port', {
+      method: 'POST',
+      body: JSON.stringify({ host, port: parseInt(port, 10) })
+    });
+    setTesting(false);
+    setResult(res);
+  };
+
+  return (
+    <div className="glass-card full-width" style={{ marginTop: '18px' }}>
+      <div className="card-header"><Icons.Zap /> TCP 端口连通性握手测试器</div>
+      <form onSubmit={handleTest} style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          value={host}
+          onChange={e => setHost(e.target.value)}
+          placeholder="Host (如 127.0.0.1 / localhost / baidu.com)"
+          style={{ flex: 2, padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(0,0,0,0.15)', color: 'inherit', fontFamily: 'var(--mono)', fontSize: '0.86rem' }}
+        />
+        <input
+          type="number"
+          value={port}
+          onChange={e => setPort(e.target.value)}
+          placeholder="Port (如 80 / 8080 / 6379)"
+          style={{ flex: 1, padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'rgba(0,0,0,0.15)', color: 'inherit', fontFamily: 'var(--mono)', fontSize: '0.86rem' }}
+        />
+        <button type="submit" className="action-btn" disabled={testing}>
+          {testing ? <Icons.Loader /> : <Icons.Zap />} {testing ? '测试中...' : '检测端口'}
+        </button>
+      </form>
+
+      {result && (
+        <div style={{ marginTop: '12px' }}>
+          <InfoRow
+            label={`Socket 握手 [${result.host}:${result.port}]`}
+            val={result.open ? `${result.message}` : `握手失败: ${result.error || result.message}`}
+            status={result.open ? 'good' : 'bad'}
+            onCopy={onCopy}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// 2. 网络基础 View
   if (activeTab === 'network') {
     return (
-      <div className="card-grid">
-        <GlassCard title="网络基础连通性明细" icon={<Icons.Globe />}>
-          <InfoRow label="活跃接口" val={data.active_if || '?'} status="good" onCopy={onCopy} />
-          <InfoRow label="本机 IP" val={data.ip || '?'} status="good" onCopy={onCopy} />
-          <InfoRow label="默认网关" val={data.gateway || '?'} status="good" onCopy={onCopy} />
-          <InfoRow label="DNS 服务器" val={(data.dns || []).join(', ') || '?'} status="good" onCopy={onCopy} />
-          <InfoRow label="百度 Ping" val={data.ping_baidu ? '可达' : '不可达'} status={data.ping_baidu ? 'good' : 'bad'} onCopy={onCopy} />
-          <InfoRow label="8.8.8.8 Ping" val={data.ping_google ? '可达' : '不可达'} status={data.ping_google ? 'good' : 'warn'} onCopy={onCopy} />
-          <InfoRow label="百度 HTTPS 连接" val={data.http_baidu ? '正常' : '失败'} status={data.http_baidu ? 'good' : 'bad'} onCopy={onCopy} />
-        </GlassCard>
-      </div>
+      <>
+        <div className="card-grid">
+          <GlassCard title="网络基础连通性明细" icon={<Icons.Globe />}>
+            <InfoRow label="活跃接口" val={data.active_if || '?'} status="good" onCopy={onCopy} />
+            <InfoRow label="本机 IP" val={data.ip || '?'} status="good" onCopy={onCopy} />
+            <InfoRow label="默认网关" val={data.gateway || '?'} status="good" onCopy={onCopy} />
+            <InfoRow label="DNS 服务器" val={(data.dns || []).join(', ') || '?'} status="good" onCopy={onCopy} />
+            <InfoRow label="百度 Ping" val={data.ping_baidu ? '可达' : '不可达'} status={data.ping_baidu ? 'good' : 'bad'} onCopy={onCopy} />
+            <InfoRow label="8.8.8.8 Ping" val={data.ping_google ? '可达' : '不可达'} status={data.ping_google ? 'good' : 'warn'} onCopy={onCopy} />
+            <InfoRow label="百度 HTTPS 连接" val={data.http_baidu ? '正常' : '失败'} status={data.http_baidu ? 'good' : 'bad'} onCopy={onCopy} />
+          </GlassCard>
+        </div>
+
+        <PortProbe onCopy={onCopy} />
+      </>
     );
   }
+
 
   // 3. 节点 Latency & DNS Benchmark 测速 View
   if (activeTab === 'latency') {

@@ -15,11 +15,13 @@ from diagnostics import (
     check_network,
     check_latency,
     benchmark_dns,
+    check_port,
     check_proxy,
     fix_chrome_dns,
     flush_dns,
     disable_system_proxy,
     flush_arp,
+    renew_dhcp,
 )
 
 
@@ -129,5 +131,22 @@ async def api_disable_proxy():
 @app.post("/api/fix/flush-arp")
 async def api_flush_arp():
     return await flush_arp()
+
+
+@app.post("/api/fix/renew-dhcp")
+async def api_renew_dhcp():
+    return await renew_dhcp()
+
+
+@app.post("/api/check/port")
+async def api_check_port(request: Request):
+    try:
+        body = await request.json()
+        host = body.get("host", "127.0.0.1")
+        port = int(body.get("port", 80))
+        return await check_port(host, port)
+    except Exception as e:
+        return {"open": False, "error": str(e), "message": "请求格式错误"}
+
 
 

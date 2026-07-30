@@ -41,3 +41,12 @@ async def flush_arp() -> dict:
     r = await run("sudo arp -d -a 2>/dev/null || arp -d -a 2>/dev/null || true")
     return {"success": True, "message": "ARP 路由表缓存已清理"}
 
+
+async def renew_dhcp() -> dict:
+    """Renew DHCP lease on active Wi-Fi/Ethernet interface."""
+    r_if = await run("route -n get default 2>/dev/null | grep 'interface:' | awk '{print $2}'")
+    iface = r_if.stdout.strip() or "en0"
+    await run(f"ipconfig set {iface} DHCP 2>/dev/null || true")
+    return {"success": True, "iface": iface, "message": f"网卡 {iface} DHCP 租约已成功重置"}
+
+
