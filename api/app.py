@@ -1,8 +1,9 @@
 """FastAPI application — async endpoints for the network doctor dashboard."""
 
 import asyncio
+import time
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
@@ -20,7 +21,21 @@ from diagnostics import (
     flush_arp,
 )
 
-app = FastAPI(title="Network Doctor", version="1.0.0", docs_url=None, redoc_url=None)
+app = FastAPI(title="Network Doctor", version="1.6.0", docs_url=None, redoc_url=None)
+
+
+# ── Terminal Logger Middleware ──────────────────────────────
+@app.middleware("http")
+async def log_api_requests(request: Request, call_next):
+    t0 = time.time()
+    response = await call_next(request)
+    dt = int((time.time() - t0) * 1000)
+    # Only print API requests to keep terminal logs clean and insightful
+    if request.url.path.startswith("/api"):
+        now_str = time.strftime("%H:%M:%S")
+        print(f"[{now_str}] API {request.method} {request.url.path} → {response.status_code} ({dt}ms)")
+    return response
+
 
 
 # ── Static files ──────────────────────────────────────────────

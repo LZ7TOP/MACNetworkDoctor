@@ -20,11 +20,13 @@ def main():
     import uvicorn
 
     print()
-    print("╔══════════════════════════════════════════════════════╗")
-    print("║        Network Doctor — Web 控制台 v1.6 (热更新)     ║")
-    print("║        http://localhost:19999                        ║")
-    print("║        按 Ctrl+C 停止                               ║")
-    print("╚══════════════════════════════════════════════════════╝")
+    print("┌──────────────────────────────────────────────────────────┐")
+    print("│             Network Doctor — Web 控制台 v1.6             │")
+    print("├──────────────────────────────────────────────────────────┤")
+    print("│  本地访问: http://localhost:19999                         │")
+    print("│  开发状态: 代码热更新 (Hot Reload Enabled)               │")
+    print("│  退出控制: 按 Ctrl+C 终止运行                             │")
+    print("└──────────────────────────────────────────────────────────┘")
     print()
 
     uvicorn.run(
@@ -33,8 +35,9 @@ def main():
         port=19999,
         reload=True,
         reload_dirs=["api", "diagnostics", "static"],
-        log_level="info",
+        log_level="warning",
     )
+
 
 
 if __name__ == "__main__":
