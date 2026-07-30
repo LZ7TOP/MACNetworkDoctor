@@ -51,32 +51,32 @@
 
 /* Light Theme Overrides */
 [data-theme="light"] {
-  --bg:           #f8fafc;
-  --bg-subtle:    #f1f5f9;
-  --surface:      rgba(255, 255, 255, 0.85);
-  --card:         rgba(255, 255, 255, 0.7);
-  --card-hover:   rgba(255, 255, 255, 0.95);
+  --bg:           #f1f5f9;
+  --bg-subtle:    #e2e8f0;
+  --surface:      rgba(255, 255, 255, 0.88);
+  --card:         #ffffff;
+  --card-hover:   #ffffff;
   --border:       rgba(0, 0, 0, 0.08);
   --border-hover: rgba(0, 0, 0, 0.16);
   --border-blue:  rgba(37, 99, 235, 0.4);
   
   --text:         #0f172a;
   --text-muted:   #475569;
-  --muted:        #94a3b8;
+  --muted:        #64748b;
   
-  --green:        #059669;
-  --green-bg:     rgba(16, 185, 129, 0.12);
-  --green-border: rgba(16, 185, 129, 0.35);
+  --green:        #047857;
+  --green-bg:     rgba(16, 185, 129, 0.14);
+  --green-border: rgba(16, 185, 129, 0.4);
   
-  --red:          #dc2626;
-  --red-bg:       rgba(239, 68, 68, 0.12);
-  --red-border:   rgba(239, 68, 68, 0.35);
+  --red:          #b91c1c;
+  --red-bg:       rgba(239, 68, 68, 0.14);
+  --red-border:   rgba(239, 68, 68, 0.4);
   
-  --yellow:       #d97706;
-  --yellow-bg:    rgba(245, 158, 11, 0.12);
-  --yellow-border: rgba(245, 158, 11, 0.35);
+  --yellow:       #b45309;
+  --yellow-bg:    rgba(245, 158, 11, 0.14);
+  --yellow-border: rgba(245, 158, 11, 0.4);
   
-  --blue:         #2563eb;
+  --blue:         #1d4ed8;
   --blue-bg:      rgba(37, 99, 235, 0.12);
   --blue-border:  rgba(37, 99, 235, 0.35);
 
@@ -93,20 +93,91 @@
   background: rgba(255, 255, 255, 0.85);
 }
 
+[data-theme="light"] .status-banner {
+  background: rgba(241, 245, 249, 0.9);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #334155;
+}
+
 [data-theme="light"] .tabs-group {
-  background: rgba(241, 245, 249, 0.8);
+  background: rgba(226, 232, 240, 0.7);
+}
+
+[data-theme="light"] .tab-btn {
+  color: #475569;
+}
+
+[data-theme="light"] .tab-btn:hover {
+  color: #0f172a;
+  background: rgba(0, 0, 0, 0.04);
 }
 
 [data-theme="light"] .tab-btn.active {
-  background: rgba(37, 99, 235, 0.14);
+  background: #ffffff;
   border-color: rgba(37, 99, 235, 0.35);
-  color: #2563eb;
+  color: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+}
+
+[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .card-header {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+[data-theme="light"] .info-label {
+  color: #334155;
+}
+
+[data-theme="light"] .gauge-score {
+  color: #0f172a;
+}
+
+[data-theme="light"] .action-btn {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #1e293b;
+}
+
+[data-theme="light"] .action-btn:hover {
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+[data-theme="light"] .action-btn.danger-btn {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(254, 226, 226, 0.6);
+  color: #dc2626;
+}
+
+[data-theme="light"] .alert-box.warn {
+  background: rgba(254, 243, 199, 0.85);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #92400e;
+}
+
+[data-theme="light"] .alert-box.ok {
+  background: rgba(209, 250, 229, 0.85);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #065f46;
+}
+
+[data-theme="light"] .alert-box.bad {
+  background: rgba(254, 226, 226, 0.85);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #991b1b;
 }
 
 [data-theme="light"] .code-wrapper {
-  background: #0f172a;
+  background: #1e293b;
   color: #38bdf8;
 }
+
 
 /* Theme Switcher Segmented Control UI */
 .theme-switcher {
