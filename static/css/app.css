@@ -49,6 +49,107 @@
   color-scheme: dark;
 }
 
+/* Light Theme Overrides */
+[data-theme="light"] {
+  --bg:           #f8fafc;
+  --bg-subtle:    #f1f5f9;
+  --surface:      rgba(255, 255, 255, 0.85);
+  --card:         rgba(255, 255, 255, 0.7);
+  --card-hover:   rgba(255, 255, 255, 0.95);
+  --border:       rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.16);
+  --border-blue:  rgba(37, 99, 235, 0.4);
+  
+  --text:         #0f172a;
+  --text-muted:   #475569;
+  --muted:        #94a3b8;
+  
+  --green:        #059669;
+  --green-bg:     rgba(16, 185, 129, 0.12);
+  --green-border: rgba(16, 185, 129, 0.35);
+  
+  --red:          #dc2626;
+  --red-bg:       rgba(239, 68, 68, 0.12);
+  --red-border:   rgba(239, 68, 68, 0.35);
+  
+  --yellow:       #d97706;
+  --yellow-bg:    rgba(245, 158, 11, 0.12);
+  --yellow-border: rgba(245, 158, 11, 0.35);
+  
+  --blue:         #2563eb;
+  --blue-bg:      rgba(37, 99, 235, 0.12);
+  --blue-border:  rgba(37, 99, 235, 0.35);
+
+  color-scheme: light;
+}
+
+[data-theme="light"] body {
+  background-image: 
+    radial-gradient(at 50% 0%, #e0f2fe 0px, transparent 60%),
+    radial-gradient(at 100% 100%, #e0e7ff 0px, transparent 50%);
+}
+
+[data-theme="light"] .app-header {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="light"] .tabs-group {
+  background: rgba(241, 245, 249, 0.8);
+}
+
+[data-theme="light"] .tab-btn.active {
+  background: rgba(37, 99, 235, 0.14);
+  border-color: rgba(37, 99, 235, 0.35);
+  color: #2563eb;
+}
+
+[data-theme="light"] .code-wrapper {
+  background: #0f172a;
+  color: #38bdf8;
+}
+
+/* Theme Switcher Segmented Control UI */
+.theme-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  padding: 3px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .theme-switcher {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.theme-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-btn.active {
+  background: var(--blue);
+  color: #ffffff;
+  box-shadow: 0 0 10px var(--blue-glow);
+}
+
+
 
 *, *::before, *::after {
   box-sizing: border-box;

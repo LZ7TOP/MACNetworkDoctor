@@ -68,8 +68,78 @@ const Icons = {
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
     </svg>
+  ),
+  Sun: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  ),
+  Moon: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  ),
+  Monitor: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+    </svg>
   )
 };
+
+// ── Theme Switcher Component ────────────────────────────────
+function ThemeSwitcher() {
+  const [themeMode, setThemeMode] = useState(() => {
+    return localStorage.getItem('theme_mode') || 'system';
+  });
+
+  const applyTheme = useCallback((mode) => {
+    let effectiveTheme = mode;
+    if (mode === 'system') {
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      effectiveTheme = isSystemDark ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', effectiveTheme);
+  }, []);
+
+  useEffect(() => {
+    applyTheme(themeMode);
+    localStorage.setItem('theme_mode', themeMode);
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemChange = () => {
+      if (themeMode === 'system') applyTheme('system');
+    };
+    mediaQuery.addEventListener('change', handleSystemChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemChange);
+  }, [themeMode, applyTheme]);
+
+  return (
+    <div className="theme-switcher" title="切换浅色 / 深色 / 系统跟随主题">
+      <button
+        className={`theme-btn ${themeMode === 'light' ? 'active' : ''}`}
+        onClick={() => setThemeMode('light')}
+        title="浅色模式"
+      >
+        <Icons.Sun />
+      </button>
+      <button
+        className={`theme-btn ${themeMode === 'dark' ? 'active' : ''}`}
+        onClick={() => setThemeMode('dark')}
+        title="深色模式"
+      >
+        <Icons.Moon />
+      </button>
+      <button
+        className={`theme-btn ${themeMode === 'system' ? 'active' : ''}`}
+        onClick={() => setThemeMode('system')}
+        title="跟随系统"
+      >
+        <Icons.Monitor />
+      </button>
+    </div>
+  );
+}
+
 
 // ── Status Badge Component ──────────────────────────────────
 function StatusBadge({ status, text }) {
@@ -253,32 +323,37 @@ function App() {
             </div>
           </div>
 
-          <div className="gauge-card">
-            <div className="gauge-ring">
-              <svg width="56" height="56" style={{ transform: 'rotate(-90deg)' }}>
-                <circle cx="28" cy="28" r="22" stroke="rgba(255,255,255,0.08)" strokeWidth="5" fill="transparent" />
-                <circle
-                  cx="28" cy="28" r="22"
-                  stroke={healthScore < 60 ? 'var(--red)' : healthScore < 90 ? 'var(--yellow)' : 'var(--green)'}
-                  strokeWidth="5" strokeLinecap="round" fill="transparent"
-                  strokeDasharray="138.2"
-                  strokeDashoffset={138.2 - (healthScore / 100) * 138.2}
-                  style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-                />
-              </svg>
-              <span className="gauge-score" style={{ color: healthScore < 60 ? 'var(--red)' : healthScore < 90 ? 'var(--yellow)' : '#fff' }}>
-                {healthScore}
-              </span>
-            </div>
-            <div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Health Index</div>
-              <div style={{ fontSize: '0.92rem', fontWeight: 700, color: healthScore === 100 ? 'var(--green)' : 'var(--yellow)' }}>
-                {healthScore === 100 ? '健康良好' : healthScore >= 75 ? '存在隐患' : '需重点排查'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <ThemeSwitcher />
+
+            <div className="gauge-card">
+              <div className="gauge-ring">
+                <svg width="56" height="56" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle cx="28" cy="28" r="22" stroke="rgba(255,255,255,0.08)" strokeWidth="5" fill="transparent" />
+                  <circle
+                    cx="28" cy="28" r="22"
+                    stroke={healthScore < 60 ? 'var(--red)' : healthScore < 90 ? 'var(--yellow)' : 'var(--green)'}
+                    strokeWidth="5" strokeLinecap="round" fill="transparent"
+                    strokeDasharray="138.2"
+                    strokeDashoffset={138.2 - (healthScore / 100) * 138.2}
+                    style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                  />
+                </svg>
+                <span className="gauge-score" style={{ color: healthScore < 60 ? 'var(--red)' : healthScore < 90 ? 'var(--yellow)' : 'inherit' }}>
+                  {healthScore}
+                </span>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Health Index</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 700, color: healthScore === 100 ? 'var(--green)' : 'var(--yellow)' }}>
+                  {healthScore === 100 ? '健康良好' : healthScore >= 75 ? '存在隐患' : '需重点排查'}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </header>
+
 
       {/* Status Bar */}
       <div className="status-banner">
