@@ -85,6 +85,7 @@ network-doctor/
 后端基于 FastAPI 提供高效的 RESTful JSON 接口：
 
 ### 诊断数据接口 (GET)
+
 | 接口地址 | 说明 | 诊断内容 |
 | :--- | :--- | :--- |
 | `GET /api/diagnose` | **全面并发诊断** | 并发执行所有模块检查并计算系统健康指数 |
@@ -97,6 +98,7 @@ network-doctor/
 | `GET /api/check/hosts` | Hosts 条目分析 | `/etc/hosts` 中非默认域名重定向解析 |
 
 ### 一键修复接口 (POST)
+
 | 接口地址 | 说明 | 底层操作命令 |
 | :--- | :--- | :--- |
 | `POST /api/fix/flush-dns` | 刷新 macOS 系统 DNS 缓存 | `dscacheutil -flushcache; killall -HUP mDNSResponder` |
@@ -105,6 +107,7 @@ network-doctor/
 | `POST /api/fix/chrome-dns` | 修复 Chrome 安全 DNS | 修改 Chrome `Local State` 文件中 `dns_over_https.mode` 为 `"off"` |
 
 ---
+
 
 ## Git 提交规范 (Commit Standards)
 
